@@ -1,5 +1,6 @@
 package com.nashtech.ecommerce.service;
 
+import com.nashtech.ecommerce.dto.ProductDto;
 import com.nashtech.ecommerce.entity.Product;
 import org.springframework.stereotype.Service;
 
@@ -9,14 +10,15 @@ import java.util.Optional;
 @Service
 public interface ProductService {
 
-    public List<Product> retrieveProducts();
+    public List<ProductDto> retrieveProducts();
 
-    public Optional<Product> getProductById(Long productId);
+    public ProductDto getProductById(Long productId);
 
-    public Product saveProduct(Product product);
+    public ProductDto saveProduct(ProductDto productDto);
 
-    public void deleteProduct(Long productId);
+    public boolean deleteProduct(Long productId);
 
-    public void updateProduct(Product product);
+    public boolean updateProduct(ProductDto productDto);
 
+    public boolean existsById(Long productId);
 }

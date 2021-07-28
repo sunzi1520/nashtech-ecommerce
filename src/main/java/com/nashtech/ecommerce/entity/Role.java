@@ -1,11 +1,13 @@
 package com.nashtech.ecommerce.entity;
 
 import com.nashtech.ecommerce.enumeration.ERoleName;
+import lombok.Data;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "roles")
+@Data
 public class Role {
 
     @Id

@@ -6,7 +6,7 @@ import org.modelmapper.AbstractConverter;
 
 import java.util.stream.Collectors;
 
-public class UserConverter extends AbstractConverter<User, UserDto> {
+public class UserToUserDtoConverter extends AbstractConverter<User, UserDto> {
 
     @Override
     protected UserDto convert(User user) {

@@ -1,9 +1,16 @@
 package com.nashtech.ecommerce.entity;
 
+import lombok.Data;
+import lombok.Getter;
+import org.hibernate.annotations.Formula;
+
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
+@Data
 public class Product {
 
     @Id
@@ -21,47 +28,16 @@ public class Product {
     @Column(name = "product_description")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @Column(name = "product_image")
+    private byte[] image;
 
-    public Long getId() {
-        return id;
-    }
+    @Formula("(select avg(r.point) from ratings r where r.product_id = product_id)")
+    @Getter
+    private Float avg_rating;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @ManyToMany
+    @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id")
+            , inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<Category> categories = new HashSet<>();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Float getPrice() {
-        return price;
-    }
-
-    public void setPrice(Float price) {
-        this.price = price;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
 }

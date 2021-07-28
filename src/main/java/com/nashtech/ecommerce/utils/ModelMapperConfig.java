@@ -14,6 +14,7 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
+                .setSkipNullEnabled(true)
                 .setFieldMatchingEnabled(true)
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);

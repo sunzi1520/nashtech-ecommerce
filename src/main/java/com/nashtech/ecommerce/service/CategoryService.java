@@ -1,5 +1,6 @@
 package com.nashtech.ecommerce.service;
 
+import com.nashtech.ecommerce.dto.CategoryDto;
 import com.nashtech.ecommerce.entity.Category;
 import org.springframework.stereotype.Service;
 
@@ -9,14 +10,16 @@ import java.util.Optional;
 @Service
 public interface CategoryService {
 
-    public List<Category> retrieveCategories();
+    public List<CategoryDto> retrieveCategories();
 
-    public Category getCategoryById(Long categoryId);
+    public CategoryDto getCategoryById(Long categoryId);
 
-    public Category saveCategory(Category category);
+    public CategoryDto saveCategory(CategoryDto categoryDto);
 
     public boolean deleteCategory(Long categoryId);
 
-    public boolean updateCategory(Category category);
+    public boolean updateCategory(CategoryDto categoryDto);
+
+    public boolean existsById(Long categoryId);
 
 }

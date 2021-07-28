@@ -24,7 +24,7 @@ import java.util.Set;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     @Autowired
@@ -58,7 +58,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> createUser(@Validated @RequestBody UserDto userDto) {
+    public ResponseEntity<?> saveUser(@Validated @RequestBody UserDto userDto) {
         userDto.setUsername(userDto.getUsername().toLowerCase().trim());
         if (userService.existsByUsername(userDto.getUsername())) {
             return new ResponseEntity(new MessageResponse("Error: Username is already taken!"), HttpStatus.BAD_REQUEST);
@@ -85,7 +85,7 @@ public class UserController {
     public ResponseEntity<?> updateUser(@PathVariable Long userId, @Validated @RequestBody UserDto userDto) {
 
         if (!userService.existsById(userId)) {
-            return new ResponseEntity(new MessageResponse("Error: Username not found!"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(new MessageResponse("Error: User not found!"), HttpStatus.NOT_FOUND);
         }
 
         if (userDto.getId() == null || userId != userDto.getId()) {
@@ -99,7 +99,9 @@ public class UserController {
             return new ResponseEntity(new MessageResponse("Error: Username is already taken!"), HttpStatus.BAD_REQUEST);
         }
 
-        userDto.setPassword(encoder.encode(userDto.getPassword()));
+        if ((userDto.getPassword() != null) && (!userDto.getPassword().isEmpty())){
+            userDto.setPassword(encoder.encode(userDto.getPassword()));
+        }
         if (userService.updateUser(userDto)) {
             return new ResponseEntity<>(HttpStatus.OK);
         };

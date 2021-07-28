@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class AuthController {
     public ResponseEntity<?> authenticateUser(@Validated @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase().trim(),
                         loginRequest.getPassword())
         );
 
@@ -63,7 +63,9 @@ public class AuthController {
             return new ResponseEntity(new MessageResponse("Error: Username is already taken!"), HttpStatus.BAD_REQUEST);
         }
 
-        UserDto userDto = new UserDto(signupRequest.getUsername(), encoder.encode(signupRequest.getPassword()));
+        UserDto userDto = new UserDto();
+        userDto.setUsername(signupRequest.getUsername().toLowerCase().trim());
+        userDto.setPassword(encoder.encode(signupRequest.getPassword()));
         Set<Long> roles = signupRequest.getRoles();
         if (roles == null){
             roles = new HashSet<>();

@@ -1,13 +1,16 @@
 package com.nashtech.ecommerce.service.impl;
 
+import com.nashtech.ecommerce.dto.CategoryDto;
 import com.nashtech.ecommerce.entity.Category;
 import com.nashtech.ecommerce.repository.CategoryRepository;
 import com.nashtech.ecommerce.service.CategoryService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -15,32 +18,44 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Override
-    public List<Category> retrieveCategories() {
-        return categoryRepository.findAll();
+    @Autowired
+    private ModelMapper modelMapper;
+
+    private CategoryDto convertCategoryToCategoryDto(Category category) {
+        return modelMapper.map(category, CategoryDto.class);
+    }
+
+    private Category convertCategoryDtoToCategory(CategoryDto categoryDto) {
+        return modelMapper.map(categoryDto, Category.class);
     }
 
     @Override
-    public Category getCategoryById(Long categoryId) {
+    public List<CategoryDto> retrieveCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream()
+                .map(category -> convertCategoryToCategoryDto(category))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CategoryDto getCategoryById(Long categoryId) {
         Optional<Category> existingCategory = categoryRepository.findById(categoryId);
 
         if (!existingCategory.isPresent()) {
-            return existingCategory.get();
-        } else {
             return null;
         }
+
+        return convertCategoryToCategoryDto(existingCategory.get());
 
     }
 
     @Override
-    public Category saveCategory(Category category) {
-        Optional<Category> existingCategory = categoryRepository.findById(category.getId());
+    public CategoryDto saveCategory(CategoryDto categoryDto) {
+        Category category = convertCategoryDtoToCategory(categoryDto);
+        Category savedCategory = categoryRepository.save(category);
 
-        if (!existingCategory.isPresent()) {
-            return categoryRepository.save(category);
-        } else {
-            return null;
-        }
+        CategoryDto savedCategoryDto = convertCategoryToCategoryDto(savedCategory);
+        return savedCategoryDto;
     }
 
     @Override
@@ -48,7 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
         Optional<Category> existingCategory = categoryRepository.findById(categoryId);
 
         if (existingCategory.isPresent()) {
-            categoryRepository.delete(existingCategory.get());
+            categoryRepository.deleteById(categoryId);
             return true;
         }
 
@@ -56,17 +71,23 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public boolean updateCategory(Category category) {
-        Optional<Category> existingCategory = categoryRepository.findById(category.getId());
+    public boolean updateCategory(CategoryDto categoryDto) {
+        Optional<Category> existingCategory = categoryRepository.findById(categoryDto.getId());
 
         if (existingCategory.isPresent()) {
             Category oldCategory = existingCategory.get();
-            oldCategory.setName(category.getName());
-            oldCategory.setDescription(category.getDescription());
+            oldCategory.setName(categoryDto.getName());
+            oldCategory.setDescription(categoryDto.getDescription());
+            categoryRepository.save(oldCategory);
 
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public boolean existsById(Long categoryId) {
+        return categoryRepository.existsById(categoryId);
     }
 }

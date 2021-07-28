@@ -6,15 +6,12 @@ import com.nashtech.ecommerce.entity.User;
 import com.nashtech.ecommerce.repository.RoleRepository;
 import com.nashtech.ecommerce.repository.UserRepository;
 import com.nashtech.ecommerce.service.UserService;
-import com.nashtech.ecommerce.utils.RoleListConverter;
-import com.nashtech.ecommerce.utils.UserConverter;
+import com.nashtech.ecommerce.utils.UserToUserDtoConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.print.attribute.standard.Destination;
 import javax.transaction.Transactional;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,24 +29,18 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ModelMapper modelMapper;
 
+    private UserDto convertUserToUserDto(User user) {
+        return modelMapper.typeMap(User.class, UserDto.class)
+                .setConverter(new UserToUserDtoConverter())
+                .map(user);
+    }
+
     @Override
     public List<UserDto> retrieveUsers() {
 
         return userRepository.findAll()
                 .stream()
-                .map(user -> new UserDto(user.getId(),
-                                         user.getUsername(),
-                                         user.getPassword(),
-                                         user.getRoles().stream()
-                                            .map(role -> role.getId())
-                                            .collect(Collectors.toSet()),
-                                         user.getFirstname(),
-                                         user.getLastname(),
-                                         user.getGender(),
-                                         user.getDob(),
-                                         user.getEmail(),
-                                         user.getPhonenumber())
-                )
+                .map(user -> convertUserToUserDto(user))
                 .collect(Collectors.toList());
     }
 
@@ -62,17 +53,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return new UserDto(user.get().getId(),
-                user.get().getUsername(), user.get().getPassword(),
-                user.get().getRoles().stream()
-                    .map(role -> role.getId())
-                    .collect(Collectors.toSet()),
-                user.get().getFirstname(),
-                user.get().getLastname(),
-                user.get().getGender(),
-                user.get().getDob(),
-                user.get().getEmail(),
-                user.get().getPhonenumber());
+        return convertUserToUserDto(user.get());
     }
 
     @Override
@@ -99,18 +80,7 @@ public class UserServiceImpl implements UserService {
 
             User savedUser = userRepository.save(user);
 
-            return new UserDto(savedUser.getId(),
-                    savedUser.getUsername(),
-                    savedUser.getPassword(),
-                    savedUser.getRoles().stream()
-                            .map(role -> role.getId())
-                            .collect(Collectors.toSet()),
-                    savedUser.getFirstname(),
-                    savedUser.getLastname(),
-                    savedUser.getGender(),
-                    savedUser.getDob(),
-                    savedUser.getEmail(),
-                    savedUser.getPhonenumber());
+            return  convertUserToUserDto(savedUser);
         } catch(RuntimeException e) {
             throw e;
         }
@@ -137,24 +107,26 @@ public class UserServiceImpl implements UserService {
         if (existingUser.isPresent()) {
             User user = existingUser.get();
             modelMapper.map(userDto, user);
-            Set<Role> roles;
-            try {
-                roles = userDto.getRoles().stream()
-                        .map((roleId) -> {
-                            Role role = roleRepository.findById(roleId)
-                                    .orElseThrow(() -> new RuntimeException("Error: Role not found."));
-                            return role;
-                        })
-                        .collect(Collectors.toSet());
+            if ((userDto.getRoles() != null) && (!userDto.getRoles().isEmpty())){
+                Set<Role> roles;
+                try {
+                    roles = userDto.getRoles().stream()
+                            .map((roleId) -> {
+                                Role role = roleRepository.findById(roleId)
+                                        .orElseThrow(() -> new RuntimeException("Error: Role not found."));
+                                return role;
+                            })
+                            .collect(Collectors.toSet());
 
-                user.setRoles(roles);
-
-                userRepository.save(user);
-
-                return true;
-            } catch(RuntimeException e) {
-                throw e;
+                    user.setRoles(roles);
+                } catch(RuntimeException e) {
+                    throw e;
+                }
             }
+
+            userRepository.save(user);
+
+            return true;
         }
 
         return false;
@@ -175,11 +147,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAllByUsername(username);
 
         return users.stream()
-                    .map(user -> new UserDto(user.getId(), user.getUsername(), user.getPassword(),
-                            user.getRoles().stream().map(role -> role.getId()).collect(Collectors.toSet()),
-                            user.getFirstname(), user.getLastname(), user.getGender(), user.getDob(),
-                            user.getEmail(), user.getPhonenumber())
-                    )
+                    .map(user -> convertUserToUserDto(user))
                     .collect(Collectors.toList());
     }
 
@@ -192,18 +160,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return new UserDto(user.get().getId(),
-                user.get().getUsername(), user.get().getPassword(),
-                user.get().getRoles().stream()
-                        .map(role -> role.getId())
-                        .collect(Collectors.toSet()),
-                user.get().getFirstname(),
-                user.get().getLastname(),
-                user.get().getGender(),
-                user.get().getDob(),
-                user.get().getEmail(),
-                user.get().getPhonenumber()
-                );
+        return convertUserToUserDto(user.get());
     }
 
 }
