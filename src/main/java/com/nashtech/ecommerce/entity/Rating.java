@@ -1,6 +1,8 @@
 package com.nashtech.ecommerce.entity;
 
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -29,7 +31,12 @@ public class Rating {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "postedDate")
-    private Date postedDate;
+    @CreationTimestamp
+    @Column(name = "createdDate")
+    private Date createdDate;
+
+    @UpdateTimestamp
+    @Column(name = "updatedDate")
+    private Date updatedDate;
 
 }

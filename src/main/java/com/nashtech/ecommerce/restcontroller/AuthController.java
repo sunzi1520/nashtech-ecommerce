@@ -5,9 +5,11 @@ import com.nashtech.ecommerce.enumeration.ERoleName;
 import com.nashtech.ecommerce.security.jwt.JwtUtils;
 import com.nashtech.ecommerce.security.service.UserDetailsImpl;
 import com.nashtech.ecommerce.service.UserService;
+import com.nashtech.ecommerce.view.Views;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,8 +76,17 @@ public class AuthController {
             roles.add(ERoleName.ROLE_CUSTOMER.ordinal()+1L);
         }
         userDto.setRoles(signupRequest.getRoles());
+        userDto.setFirstname(signupRequest.getFirstname());
+        userDto.setLastname(signupRequest.getLastname());
+        userDto.setGender(signupRequest.isGender());
+        userDto.setDob(signupRequest.getDob());
+        userDto.setEmail(signupRequest.getEmail());
+        userDto.setPhonenumber(signupRequest.getPhonenumber());
 
-        return new ResponseEntity<>(userService.saveUser(userDto), HttpStatus.OK);
+        MappingJacksonValue userJson = new MappingJacksonValue(userService.saveUser(userDto));
+        userJson.setSerializationView(Views.Public.class);
+
+        return new ResponseEntity<>(userJson, HttpStatus.OK);
 
     }
 }

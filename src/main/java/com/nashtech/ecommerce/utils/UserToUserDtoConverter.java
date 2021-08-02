@@ -20,6 +20,12 @@ public class UserToUserDtoConverter extends AbstractConverter<User, UserDto> {
                     .map(role -> role.getId())
                     .collect(Collectors.toSet())
         );
+        convertedUserDto.setFirstname(user.getFirstname());
+        convertedUserDto.setLastname(user.getLastname());
+        convertedUserDto.setGender(user.isGender());
+        convertedUserDto.setDob(user.getDob());
+        convertedUserDto.setEmail(user.getEmail());
+        convertedUserDto.setPhonenumber(user.getPhonenumber());
         return convertedUserDto;
     }
 }

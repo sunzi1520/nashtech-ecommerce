@@ -1,36 +1,33 @@
 package com.nashtech.ecommerce.entity;
 
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-public class RatingId implements Serializable {
+public class ProductCategoriesId implements Serializable {
 
     private static final long serialVersionUID =1L;
-
-    @Column(name="user_id")
-    private Long userId;
 
     @Column(name="product_id")
     private Long productId;
 
-    public RatingId() {
+    @Column(name="category_id")
+    private Long categoryId;
+
+    public ProductCategoriesId() {
         super();
     }
 
-    public RatingId(Long userId, Long productId) {
+    public ProductCategoriesId(Long productId, Long categoryId) {
         super();
-        this.userId = userId;
         this.productId = productId;
+        this.categoryId = categoryId;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
     public Long getProductId() {
@@ -39,5 +36,9 @@ public class RatingId implements Serializable {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 }

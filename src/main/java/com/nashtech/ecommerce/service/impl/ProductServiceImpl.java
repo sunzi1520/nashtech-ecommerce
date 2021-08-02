@@ -13,6 +13,8 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,13 +40,26 @@ public class ProductServiceImpl implements ProductService {
         List<CategoryDto> filledCategories = productDto.getCategories().stream()
                                         .map(categoryDto -> {
                                             Category category = categoryRepository.findById(categoryDto.getId())
-                                                    .orElseThrow(() -> new RuntimeException("Error: Role not found."));
+                                                    .orElseThrow(() -> new RuntimeException("Error: Category not found."));
                                             return modelMapper.map(category, CategoryDto.class);
                                         })
                                         .collect(Collectors.toList());
         productDto.setCategories(filledCategories);
         return modelMapper.typeMap(ProductDto.class, Product.class)
                 .map(productDto);
+    }
+
+    private void copyData(Product oldProduct, Product newProduct) {
+        if (!oldProduct.getName().equals(newProduct.getName()))
+            oldProduct.setName(newProduct.getName());
+        if (!oldProduct.getPrice().equals(newProduct.getPrice()))
+            oldProduct.setPrice(newProduct.getPrice());
+        if (!oldProduct.getImage().equals(newProduct.getImage()))
+            oldProduct.setImage(newProduct.getImage());
+        if (!oldProduct.getDescription().equals(newProduct.getDescription()))
+            oldProduct.setDescription(newProduct.getDescription());
+        if (!oldProduct.getCategories().equals(newProduct.getCategories()))
+            oldProduct.setCategories(newProduct.getCategories());
     }
 
     @Override
@@ -67,6 +82,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductDto saveProduct(ProductDto productDto) {
         try {
             Product product = convertProductDtoToProduct(productDto);
@@ -93,7 +109,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public boolean updateProduct(ProductDto productDto) {
+        Optional<Product> product = productRepository.findById(productDto.getId());
+
+        if (product.isPresent()) {
+            Product oldProduct = product.get();
+            Product newProduct = convertProductDtoToProduct(productDto);
+            copyData(oldProduct, newProduct);
+            productRepository.save(oldProduct);
+            return true;
+        }
+
         return false;
     }
 

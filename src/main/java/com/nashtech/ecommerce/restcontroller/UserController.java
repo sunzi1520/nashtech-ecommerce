@@ -64,6 +64,10 @@ public class UserController {
             return new ResponseEntity(new MessageResponse("Error: Username is already taken!"), HttpStatus.BAD_REQUEST);
         }
 
+        if (userService.existsByEmail(userDto.getUsername().toLowerCase().trim())) {
+            return new ResponseEntity(new MessageResponse("Error: Email is already taken!"), HttpStatus.BAD_REQUEST);
+        }
+
         userDto.setPassword(encoder.encode(userDto.getPassword()));
         Set<Long> roles = userDto.getRoles();
         if (roles == null) {
@@ -97,6 +101,10 @@ public class UserController {
         UserDto existingUsers = userService.getUserByUsername(userDto.getUsername());
         if (existingUsers.getId() != userDto.getId()) {
             return new ResponseEntity(new MessageResponse("Error: Username is already taken!"), HttpStatus.BAD_REQUEST);
+        }
+
+        if (userService.existsByEmail(userDto.getUsername().toLowerCase().trim())) {
+            return new ResponseEntity(new MessageResponse("Error: Email is already taken!"), HttpStatus.BAD_REQUEST);
         }
 
         if ((userDto.getPassword() != null) && (!userDto.getPassword().isEmpty())){

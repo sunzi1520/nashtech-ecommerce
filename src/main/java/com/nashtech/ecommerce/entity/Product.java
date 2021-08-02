@@ -2,9 +2,12 @@ package com.nashtech.ecommerce.entity;
 
 import lombok.Data;
 import lombok.Getter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +37,14 @@ public class Product {
     @Formula("(select avg(r.point) from ratings r where r.product_id = product_id)")
     @Getter
     private Float avg_rating;
+
+    @CreationTimestamp
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @UpdateTimestamp
+    @Column(name = "updated_date")
+    private Date updatedDate;
 
     @ManyToMany
     @JoinTable(name = "product_categories", joinColumns = @JoinColumn(name = "product_id")

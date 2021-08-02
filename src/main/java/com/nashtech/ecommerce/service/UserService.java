@@ -20,6 +20,8 @@ public interface UserService {
 
     public boolean existsByUsername(String username);
 
+    public boolean existsByEmail(String email);
+
     public boolean existsById(Long userId);
 
     public List<UserDto> getAllByUsername(String username);

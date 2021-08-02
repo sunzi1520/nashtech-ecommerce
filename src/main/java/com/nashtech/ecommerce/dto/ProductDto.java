@@ -3,6 +3,7 @@ package com.nashtech.ecommerce.dto;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -21,5 +22,9 @@ public class ProductDto {
     private Float avg_rating;
 
     private List<CategoryDto> categories = new ArrayList<>();
+
+    private Date createdDate;
+
+    private Date updatedDate;
 
 }

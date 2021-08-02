@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
@@ -62,7 +63,7 @@ public class ProductController {
             return new ResponseEntity<>(new MessageResponse("Product not found"), HttpStatus.NOT_FOUND);
         }
 
-        if (productDto.getId() == null || productId != productDto.getId()) {
+        if (productDto.getId() == null || !productId.equals(productDto.getId())) {
             productDto.setId(productId);
         }
 
@@ -72,7 +73,7 @@ public class ProductController {
                 return new ResponseEntity<>(HttpStatus.OK);
             }
 
-            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+            return new ResponseEntity<>("Unknown error", HttpStatus.NOT_MODIFIED);
 
         } catch (RuntimeException e) {
             return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
